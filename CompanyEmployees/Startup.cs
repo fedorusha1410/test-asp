@@ -47,8 +47,10 @@ namespace CompanyEmployees
             services.AddScoped<ValidateEmployeeForCompanyExistsAttribute>();
             services.ConfigureJWT(Configuration);
             services.AddScoped<IAuthenticationManager, AuthenticationManager>();
-
             services.ConfigureSwagger();
+            services.ConfigureServices();
+            //services.AddScoped<IEmployeeService, >
+
 
 
 
@@ -78,8 +80,8 @@ namespace CompanyEmployees
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseSwagger();
             app.UseSwaggerUI(s => 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public interface ICompanyRepository
+    public interface ICompanyRepository  
     {
         Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges);
         Task<Company> GetCompanyAsync(Guid companyId, bool trackChanges);
@@ -15,6 +15,8 @@ namespace Contracts
 
         Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
         void DeleteCompany(Company company);
+
+      
 
 
     }

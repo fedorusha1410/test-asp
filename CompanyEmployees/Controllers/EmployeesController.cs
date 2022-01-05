@@ -2,11 +2,12 @@
 using ClassLibrary;
 using CompanyEmployees.ActionFilters;
 using Contracts;
-using Entities.DataTransferObjects;
+using Dtos.DataTransferObjects;
+using Dtos.RequestFeatures;
 using Entities.Models;
-using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,14 @@ namespace CompanyEmployees.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+        private readonly IServiceManager _serviceManager;
 
-        public EmployeesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        public EmployeesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, IServiceManager serviceManager)
         {
             _repository = repository; 
             _logger = logger;
             _mapper = mapper;
+            _serviceManager = serviceManager;
 
         }
         [HttpGet]
@@ -34,6 +37,7 @@ namespace CompanyEmployees.Controllers
         {
             if (!employeeParameters.ValidAgeRange) 
                 return BadRequest("Max age can't be less than min age.");
+
 
             var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false); 
             if (company == null)
@@ -66,7 +70,8 @@ namespace CompanyEmployees.Controllers
                 _logger.LogInfo($"Employee with id: {id} doesn't exist in the database."); 
                 return NotFound();
             }
-            var employee = _mapper.Map<EmployeeDto>(employeeDb); return Ok(employee); 
+            var employee = _mapper.Map<EmployeeDto>(employeeDb);
+            return Ok(employee); 
         }
 
         [HttpPost]
@@ -83,13 +88,15 @@ namespace CompanyEmployees.Controllers
                 _logger.LogError("Invalid model state for the EmployeeForCreationDto object");
                 return UnprocessableEntity(ModelState);
             }
+
             var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null) 
             {
                 _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
                 return NotFound();
             }
-            var employeeEntity = _mapper.Map<Employee>(employee); _repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity);
+            var employeeEntity = _mapper.Map<Employee>(employee);
+            _repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity);
             await _repository.SaveAsync();
             var employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
             return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturn.Id }, employeeToReturn);
@@ -99,13 +106,13 @@ namespace CompanyEmployees.Controllers
         [ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
         public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid id)
         {
+            var employeeForCompany = HttpContext.Items["employee"] as Employee;
             var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
             {
                 _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
                 return NotFound();
             }
-            var employeeForCompany = HttpContext.Items["employee"] as Employee;
             _repository.Employee.DeleteEmployee(employeeForCompany);
             await _repository.SaveAsync();
             return NoContent();

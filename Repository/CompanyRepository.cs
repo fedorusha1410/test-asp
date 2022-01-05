@@ -3,6 +3,7 @@ using Entities;
 using Entities.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -16,10 +17,10 @@ namespace Repository
           
         }
         public async Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges) 
-                                            => await FindAll(trackChanges).OrderBy(c => c.Name).ToListAsync();
+                                            => await  FindAll(trackChanges).OrderBy(c => c.Name).ToListAsync();
 
-        public async Task<Company> GetCompanyAsync(Guid companyId, bool trackChanges)
-                                        => await FindByCondition(c => c.Id.Equals(companyId), trackChanges).SingleOrDefaultAsync();
+        public  async Task<Company> GetCompanyAsync(Guid companyId, bool trackChanges)
+                                        => await  FindByCondition(c => c.Id.Equals(companyId), trackChanges).SingleOrDefaultAsync();
         public void CreateCompany(Company company) => Create(company);
 
         public async Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges) 

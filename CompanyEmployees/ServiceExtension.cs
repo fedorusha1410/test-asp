@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
- 
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Entities;
 using Contracts;
 using Repository;
@@ -17,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Services;
 
 namespace CompanyEmployees
 {
@@ -36,6 +35,7 @@ namespace CompanyEmployees
 
         public static void ConfigureRepositoryManager(this IServiceCollection services) =>
                                                        services.AddScoped<IRepositoryManager, RepositoryManager>();
+
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
@@ -75,6 +75,12 @@ namespace CompanyEmployees
                 };
             });
         }
+
+        //TO DO
+        public static void ConfigureServices(this IServiceCollection services) 
+                                                        => services.AddScoped<IServiceManager, ServiceManager>();
+
+
 
         public static void ConfigureSwagger(this IServiceCollection services)
         {

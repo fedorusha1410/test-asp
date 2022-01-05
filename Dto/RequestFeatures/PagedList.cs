@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Entities.RequestFeatures
+namespace Dto.RequestFeatures
 {
     public class PagedList<T> : List<T>
     {

@@ -1,5 +1,6 @@
-﻿using Entities.Models;
-using Entities.RequestFeatures;
+﻿using Dtos.RequestFeatures;
+using Entities.Models;
+
 using System;
 using System.Collections.Generic;
 using System.Text;

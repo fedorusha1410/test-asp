@@ -1,5 +1,5 @@
 ﻿using AutoMapper.Configuration;
-using Entities.DataTransferObjects;
+using Dtos.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.IdentityModel.Tokens;

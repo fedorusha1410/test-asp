@@ -3,10 +3,11 @@ using ClassLibrary;
 using CompanyEmployees.ActionFilters;
 using CompanyEmployees.ModelBinders;
 using Contracts;
-using Entities.DataTransferObjects;
+using Dtos.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,12 +25,14 @@ namespace CompanyEmployees.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+        private readonly IServiceManager _serviceManager;
 
-        public CompaniesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        public CompaniesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, IServiceManager serviceManager)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _serviceManager = serviceManager;
         }
 
         [HttpGet(Name = "GetCompanies"), Authorize(Roles = "Manager")]
@@ -77,6 +80,7 @@ namespace CompanyEmployees.Controllers
 
 
         [HttpGet("collection/({ids})", Name = "CompanyCollection")]
+        //TO DO
         public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
         { 
             if (ids == null)
@@ -131,8 +135,7 @@ namespace CompanyEmployees.Controllers
         public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
         {
             var companyEntity = HttpContext.Items["company"] as Company;
-            _mapper.Map(company, companyEntity); 
-            await _repository.SaveAsync();
+            _serviceManager.companyService.UpdateCompanyAsync(company, companyEntity);
             return NoContent();
         }
 

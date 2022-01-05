@@ -2,7 +2,7 @@
 using ClassLibrary;
 using CompanyEmployees.ActionFilters;
 using Contracts;
-using Entities.DataTransferObjects;
+using Dtos.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +22,7 @@ namespace CompanyEmployees.Controllers
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
 
+        
         private readonly UserManager<User> _userManager;
         private readonly IAuthenticationManager _authManager;
         public AuthenticationController(ILoggerManager logger, IMapper mapper, UserManager<User> userManager, IAuthenticationManager authManager)
