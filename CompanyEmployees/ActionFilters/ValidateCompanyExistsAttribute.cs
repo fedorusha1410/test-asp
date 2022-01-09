@@ -1,4 +1,5 @@
-﻿using ClassLibrary;
+﻿using Application.Services;
+using ClassLibrary;
 using Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -10,14 +11,14 @@ using System.Threading.Tasks;
 namespace CompanyEmployees.ActionFilters
 {
     public class ValidateCompanyExistsAttribute : IAsyncActionFilter
-    {
-        private readonly IRepositoryManager _repository; 
+    { 
         private readonly ILoggerManager _logger;
+        private readonly ICompanyService _companyService;
 
-        public ValidateCompanyExistsAttribute(IRepositoryManager repositoryManager, ILoggerManager loggerManager)
+        public ValidateCompanyExistsAttribute(ILoggerManager loggerManager, ICompanyService companyService)
         {
             _logger = loggerManager;
-            _repository = repositoryManager;
+            _companyService = companyService;
 
         }
 
@@ -25,15 +26,13 @@ namespace CompanyEmployees.ActionFilters
         {
             var trackChanges = context.HttpContext.Request.Method.Equals("PUT");
             var id = (Guid)context.ActionArguments["id"];
-            var company = await _repository.Company.GetCompanyAsync(id, trackChanges);
-            if (company == null) 
+            if (!_companyService.HasCompany(id)) 
             {
                 _logger.LogInfo($"Company with id: {id} doesn't exist in the database."); 
                 context.Result = new NotFoundResult(); 
             }
             else
             {
-                context.HttpContext.Items.Add("company", company);
                 await next(); 
             }
         }

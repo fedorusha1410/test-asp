@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using Services;
+
 
 namespace CompanyEmployees
 {
@@ -75,12 +75,6 @@ namespace CompanyEmployees
                 };
             });
         }
-
-        //TO DO
-        public static void ConfigureServices(this IServiceCollection services) 
-                                                        => services.AddScoped<IServiceManager, ServiceManager>();
-
-
 
         public static void ConfigureSwagger(this IServiceCollection services)
         {

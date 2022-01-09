@@ -1,19 +1,19 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using ClassLibrary;
 using Contracts;
-using Dtos.DataTransferObjects;
-using Dtos.RequestFeatures;
+using Dto.Dto;
+using Dto.RequestFeatures;
 using Entities.Models;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services
+namespace Application.Services
 {
-    internal class EmployeeService : IEmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
@@ -30,9 +30,9 @@ namespace Services
 
 
 
-        public  EmployeeDto CreateEmployeeForCompany(Guid companyId, EmployeeForCreationDto employee)
+        public async  Task<EmployeeDto> CreateEmployeeForCompany(Guid companyId, EmployeeForCreationDto employee)
         {
-            var company =  _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
+            var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
 
             if (company == null)
             {
@@ -41,7 +41,7 @@ namespace Services
             }
             var employeeEntity = _mapper.Map<Employee>(employee);
             _repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity);
-           _repository.SaveAsync();
+           await _repository.SaveAsync();
             EmployeeDto employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
             return employeeToReturn;
 
@@ -51,32 +51,33 @@ namespace Services
 
 
 
-        public async void DeleteEmployeeForCompanyAsync(Guid companyId, Employee employee)
+        public void DeleteEmployeeForCompanyAsync(Guid companyId, Guid id)
         {
 
-            var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
+            var company =  _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
             {
                 _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
-
+                
             }
             else
             {
+                var employee =  _repository.Employee.GetEmployeeAsync(companyId, id, false) ;
+  
                 _repository.Employee.DeleteEmployee(employee);
-                await _repository.SaveAsync();
+                 _repository.SaveAsync();
             }
- 
         }
 
-        public  EmployeeDto GetEmployee(Guid companyId, Guid id)
+        public async  Task<EmployeeDto> GetEmployee(Guid companyId, Guid id)
         {
-            var company =  _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
+            var company =  await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
             {
                 _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
                 return null;
             }
-            var employeeDb = _repository.Employee.GetEmployeeAsync(companyId, id, trackChanges: false);
+            var employeeDb =  _repository.Employee.GetEmployeeAsync(companyId, id, trackChanges: false);
             if (employeeDb == null)
             {
                 _logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
@@ -86,32 +87,31 @@ namespace Services
             return employee;
         }
 
-        public async IEnumerable<EmployeeDto> GetEmployeesForCompanyAsync(Guid companyId, EmployeeParameters employeeParameters)
+        public async Task<IEnumerable<EmployeeDto>> GetEmployeesForCompanyAsync(Guid companyId, EmployeeParameters employeeParameters)
         {
             var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
 
             if (company == null)
             {
                 _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
-                //TO DO
-                return new List<EmployeeDto>();
+                return null;
             }
 
             var employeesFromDb = await _repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
 
 
-            IEnumerable<EmployeeDto> employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
-
+            var employeesDto =  _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
+          
             return employeesDto;
 
 
         }
 
 
-        public async void UpdateEmployeeForCompanyAsync(EmployeeForUpdateDto employeeDto, Employee employee)
+        public  void UpdateEmployeeForCompanyAsync(EmployeeForUpdateDto employeeDto, Employee employee)
         {
             _mapper.Map(employeeDto, employee);
-            await _repository.SaveAsync();
+             _repository.SaveAsync();
         }
 
 

@@ -15,13 +15,13 @@ namespace Entities.Configuration
         {
             builder.HasData(new IdentityRole
             {
-                Name = "Manager",  
-                NormalizedName = "MANAGER"
+                Name = "Manager", 
+                //NormalizedName = "MANAGER"
             },
                 new IdentityRole
                 {
                     Name = "Administrator",
-                    NormalizedName = "ADMINISTRATOR"
+                    //NormalizedName = "ADMINISTRATOR"
                 }
                 );
         }

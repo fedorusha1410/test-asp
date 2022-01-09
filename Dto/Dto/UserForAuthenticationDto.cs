@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Dto.DataTransferObjects
+namespace Dto.Dto
 {
     public class UserForAuthenticationDto
     {

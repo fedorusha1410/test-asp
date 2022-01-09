@@ -1,4 +1,5 @@
 using ActionFilters.Filters;
+using Application.Services;
 using ClassLibrary;
 using CompanyEmployees.ActionFilters;
 using CompanyEmployees.Extensions;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,8 +50,10 @@ namespace CompanyEmployees
             services.ConfigureJWT(Configuration);
             services.AddScoped<IAuthenticationManager, AuthenticationManager>();
             services.ConfigureSwagger();
-            services.ConfigureServices();
-            //services.AddScoped<IEmployeeService, >
+
+            services.AddTransient<ICompanyService, CompanyService>();
+            services.AddTransient<IEmployeeService, EmployeeService>();
+
 
 
 

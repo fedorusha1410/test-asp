@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dto.DataTransferObjects
+namespace Dto.Dto
 {
-    public class EmployeeForCreationDto
+    public class EmployeeForUpdateDto
     {
         public string Name { get; set; }
         public int Age { get; set; }

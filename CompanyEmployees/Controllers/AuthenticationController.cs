@@ -2,7 +2,7 @@
 using ClassLibrary;
 using CompanyEmployees.ActionFilters;
 using Contracts;
-using Dtos.DataTransferObjects;
+using Dto.Dto;
 using Entities.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +45,7 @@ namespace CompanyEmployees.Controllers
             {
                 foreach (var error in result.Errors) 
                 {
-                    ModelState.TryAddModelError(error.Code, error.Description);
+                    ModelState.TryAddModelError(error, error); //code , description
                 }
                 return BadRequest(ModelState);
             }

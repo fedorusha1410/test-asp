@@ -1,5 +1,5 @@
 ﻿using Contracts;
-using Dtos.RequestFeatures;
+using Dto.RequestFeatures;
 using Entities;
 using Entities.Models;
 using Repository.Extensions;
@@ -29,7 +29,7 @@ namespace Repository
         }
 
 
-        public async Task<Employee> GetEmployeeAsync(Guid companyId, Guid id, bool trackChanges) => await FindByCondition(e => e.CompanyId.Equals(companyId) && e.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+        public Employee GetEmployeeAsync(Guid companyId, Guid id, bool trackChanges) =>  FindByCondition(e => e.CompanyId.Equals(companyId) && e.Id.Equals(id), trackChanges).SingleOrDefault();
 
         public void CreateEmployeeForCompany(Guid companyId, Employee employee) 
         {

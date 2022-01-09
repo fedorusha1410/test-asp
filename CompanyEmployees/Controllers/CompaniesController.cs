@@ -1,13 +1,13 @@
-﻿using AutoMapper;
+﻿using Application.Services;
+using AutoMapper;
 using ClassLibrary;
 using CompanyEmployees.ActionFilters;
 using CompanyEmployees.ModelBinders;
 using Contracts;
-using Dtos.DataTransferObjects;
+using Dto.Dto;
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,54 +25,46 @@ namespace CompanyEmployees.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
-        private readonly IServiceManager _serviceManager;
+        private readonly ICompanyService _companyService;
+   
 
-        public CompaniesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, IServiceManager serviceManager)
+
+        public CompaniesController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, ICompanyService companyService)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
-            _serviceManager = serviceManager;
+            _companyService = companyService; 
         }
 
         [HttpGet(Name = "GetCompanies"), Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetCompanies()
+        public IActionResult GetCompanies()
         {
             //throw new Exception("Exception"); for testing 
-
-
-            var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges: false);
-
-
-            var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
-            return Ok(companiesDto);
+            var companies = _companyService.GetCompanyAsync();
+            return Ok(companies);
 
         }
 
         [HttpGet("{id}", Name = "CompanyById")]
-        public async Task<IActionResult> GetCompany(Guid id)
+        public IActionResult GetCompany(Guid id)
         {
-            var company = await _repository.Company.GetCompanyAsync(id, trackChanges: false);
+            var company = _companyService.GetCompanyByIdAsync(id);
             if (company == null)
             {
-                _logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
                 return NotFound();
             }
             else
             {
-                var companyDto = _mapper.Map<CompanyDto>(company);
-                return Ok(companyDto);
+                return Ok(company);
             }
         }
 
         [HttpPost]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
+        public  IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
         {
-            var companyEntity = _mapper.Map<Company>(company);
-            _repository.Company.CreateCompany(companyEntity);
-           await  _repository.SaveAsync();
-            var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
+            var companyToReturn = _companyService.CreateCompanyAsync(company);
             return CreatedAtRoute("CompanyById", new { id = companyToReturn.Id }, companyToReturn);
             //check in postman
 
@@ -98,32 +90,20 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesToReturn);
         }
 
+
         [HttpPost("collection")]
-        public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
+        public IActionResult CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
         {
-            if (companyCollection == null)
-            {
-                _logger.LogError("Company collection sent from client is null.");
-                return BadRequest("Company collection is null");
-            }
-            var companyEntities = _mapper.Map<IEnumerable<Company>>(companyCollection);
-            foreach (var company in companyEntities)
-            {
-                _repository.Company.CreateCompany(company);
-            }
-           await  _repository.SaveAsync(); 
-            var companyCollectionToReturn = _mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
-            var ids = string.Join(",", companyCollectionToReturn.Select(c => c.Id)); 
+            var companyCollectionToReturn = _companyService.CreateCompanyCollectionAsync(companyCollection) as IEnumerable<CompanyDto>;
+            var ids = string.Join(",", companyCollectionToReturn.Select(c => c.Id));
             return CreatedAtRoute("CompanyCollection", new { ids }, companyCollectionToReturn);
-         }
+        }
 
         [HttpDelete("{id}")]
         [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
-        public async Task<IActionResult> DeleteCompany(Guid id)
+        public IActionResult DeleteCompany(Guid id)
         {
-            var company = HttpContext.Items["company"] as Company;
-            _repository.Company.DeleteCompany(company);
-            await _repository.SaveAsync();
+            _companyService.DeleteCompanyAsync(id);
             return NoContent();
         }
 
@@ -132,10 +112,9 @@ namespace CompanyEmployees.Controllers
 
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
-        public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
+        public async Task<IActionResult> UpdateCompanyAsync(Guid id, [FromBody] CompanyForUpdateDto company)
         {
-            var companyEntity = HttpContext.Items["company"] as Company;
-            _serviceManager.companyService.UpdateCompanyAsync(company, companyEntity);
+            await _companyService.UpdateCompanyAsync(company);
             return NoContent();
         }
 

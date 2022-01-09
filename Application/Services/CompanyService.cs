@@ -2,7 +2,7 @@
 using AutoMapper;
 using ClassLibrary;
 using Contracts;
-using Dtos.DataTransferObjects;
+using Dto.Dto;
 using Entities.Models;
 using System;
 using System.Collections.Generic;
@@ -10,10 +10,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services
+namespace Application.Services
 {
     //TO DO
-    internal class CompanyService : ICompanyService
+    public  class CompanyService : ICompanyService
     {
 
         private readonly IRepositoryManager _repository;
@@ -36,9 +36,9 @@ namespace Services
             return companyToReturn;
         }
 
-        public async void DeleteCompanyAsync(Company company)
+        public async void DeleteCompanyAsync(Guid id)
         {
-           
+            var company = await _repository.Company.GetCompanyAsync(id, false);
             _repository.Company.DeleteCompany(company);
             await _repository.SaveAsync();
             return ;
@@ -50,6 +50,7 @@ namespace Services
 
 
             var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+
 
             return companiesDto;
 
@@ -91,10 +92,27 @@ namespace Services
             return companyCollectionToReturn;
         }
 
-        public async void UpdateCompanyAsync(CompanyForUpdateDto companyDto, Company company)
+        public async Task UpdateCompanyAsync(CompanyForUpdateDto companyDto)
         {
-            _mapper.Map(companyDto, company);
+            Company company = _mapper.Map<Company>(companyDto);
+           _mapper.Map(companyDto, company);
             await _repository.SaveAsync();
+            
+        }
+
+       
+
+        public bool HasCompany(Guid id)
+        {
+            var company = _repository.Company.GetCompanyAsync(id, false);
+            if (company != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

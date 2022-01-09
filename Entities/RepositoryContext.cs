@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Entities
 {
-    public class RepositoryContext : IdentityDbContext<User>
+    public class RepositoryContext : DbContext /*IdentityDbContext<User>*/
     {
         public RepositoryContext(DbContextOptions options)
             : base(options)
