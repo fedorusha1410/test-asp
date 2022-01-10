@@ -18,9 +18,9 @@ namespace Application.Services
 
         public Task<EmployeeDto> CreateEmployeeForCompany(Guid companyIdm, EmployeeForCreationDto employee);
 
-        public  void DeleteEmployeeForCompanyAsync(Guid companyId, Guid id);
+        public  Task DeleteEmployeeForCompanyAsync(Guid companyId, Guid id);
 
-        public void UpdateEmployeeForCompanyAsync(EmployeeForUpdateDto employeeDto, Employee employee);
+        public Task UpdateEmployeeForCompanyAsync(EmployeeForUpdateDto employeeDto, Employee employee);
        
 
 

@@ -51,10 +51,10 @@ namespace Application.Services
 
 
 
-        public void DeleteEmployeeForCompanyAsync(Guid companyId, Guid id)
+        public async Task DeleteEmployeeForCompanyAsync(Guid companyId, Guid id)
         {
 
-            var company =  _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
+            var company =  await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
             {
                 _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
@@ -108,10 +108,10 @@ namespace Application.Services
         }
 
 
-        public  void UpdateEmployeeForCompanyAsync(EmployeeForUpdateDto employeeDto, Employee employee)
+        public async Task UpdateEmployeeForCompanyAsync(EmployeeForUpdateDto employeeDto, Employee employee)
         {
             _mapper.Map(employeeDto, employee);
-             _repository.SaveAsync();
+            await _repository.SaveAsync();
         }
 
 

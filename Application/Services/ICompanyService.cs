@@ -14,7 +14,7 @@ namespace Application.Services
 
         public Task<CompanyDto> CreateCompanyAsync(CompanyForCreationDto company);
 
-        public void DeleteCompanyAsync(Guid CompanyId);
+        public Task DeleteCompanyAsync(Guid CompanyId);
 
         public Task<IEnumerable<CompanyDto>> CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection);
 

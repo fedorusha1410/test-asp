@@ -36,12 +36,12 @@ namespace Application.Services
             return companyToReturn;
         }
 
-        public async void DeleteCompanyAsync(Guid id)
+        public async Task DeleteCompanyAsync(Guid id)
         {
             var company = await _repository.Company.GetCompanyAsync(id, false);
             _repository.Company.DeleteCompany(company);
             await _repository.SaveAsync();
-            return ;
+           
         }
 
         public async Task<IEnumerable<CompanyDto>> GetCompanyAsync()
